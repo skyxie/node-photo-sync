@@ -1,0 +1,5 @@
+export LOG_LEVEL=debug
+export FLICKR_CONSUMER_KEY=d55d5a3983250419ce405da716f2b7d4
+export FLICKR_CONSUMER_SECRET=a38af098f9d8ed4c
+
+web: node bin/application.js

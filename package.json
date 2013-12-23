@@ -1,0 +1,41 @@
+{
+  "name": "node-photo-sync",
+  "version": "0.0.0",
+  "scripts": {
+    "start" : "bin/application.js",
+    "test" : "echo \"Error: no test specified\" && exit 1"
+  },
+ "repository": {
+    "type": "git",
+    "url": "https://github.com/skyxie/node-photo-sync.git"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+
+  "dependencies": {
+      "mkdirp": "*"
+    , "fs.extra": "*"
+    , "underscore": "1.5.1"
+    , "oauth" : "*"
+    , "express": "3.3.4"
+    , "winston": "*"
+    , "express-winston": "*"
+    , "mime": "1.2.9"
+  },
+
+  "devDependencies": {
+      "rewire": "*"
+    , "mocha": "1.12.0"
+    , "chai": "*"
+    , "sinon": "*"
+    , "chai": "*"
+    , "sinon-chai": "*"
+    , "supertest": "*"
+    , "grunt": "*"
+    , "grunt-contrib-clean": "*"
+    , "grunt-contrib-jshint": "*"
+    , "grunt-mocha-test": "*"
+    , "blanket": "*"
+  }
+}
