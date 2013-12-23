@@ -46,7 +46,7 @@ app.get('/flickr-oauth-request', function(req, res, next) {
 });
 
 app.get('/flickr-oauth-callback', function(req, res) {
-  res.status(200);
+  res.send("Welcome!");
 });
 
 var port = process.env.PORT || 5000;
