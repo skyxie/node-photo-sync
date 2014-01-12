@@ -5,6 +5,7 @@ var expressWinston = require("express-winston");
 
 var Flickr = require(path.resolve(__dirname, "..", "lib", "flickr")).Flickr;
 var NodePhotoSyncUtils = require(path.resolve(__dirname, "..", "lib", "utils")).NodePhotoSyncUtils;
+var PGClient = require(path.resolve(__dirname, "..", "lib", "pg-client")).PGClient;
 
 var app = express();
 
@@ -47,6 +48,17 @@ app.get('/flickr-oauth-request', function(req, res, next) {
 
 app.get('/flickr-oauth-callback', function(req, res) {
   res.send("Welcome!");
+});
+
+// Just a stupid route for dumping database information for easy debugging
+app.get('/db/table/:id', function(req, res, next) {
+  (new PGClient()).query("SELECT * FROM "+req.params.id, function(error, result) {
+    if (error) {
+      next(error);
+    } else {
+      res.json(result);
+    }
+  });
 });
 
 var port = process.env.PORT || 5000;

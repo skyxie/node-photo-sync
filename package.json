@@ -18,10 +18,11 @@
     , "fs.extra": "*"
     , "underscore": "1.5.1"
     , "oauth" : "*"
-    , "express": "3.3.4"
     , "winston": "*"
+    , "express": "3.3.4"
     , "express-winston": "*"
     , "mime": "1.2.9"
+    , "pg" : "*"
   },
 
   "devDependencies": {
