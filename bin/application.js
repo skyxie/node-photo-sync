@@ -19,6 +19,8 @@ var consoleLoggerTransport = new winston.transports.Console({
 
 NodePhotoSyncUtils.setLogger([ consoleLoggerTransport ]);
 
+var pg = new PGClient();
+
 app.use(expressWinston.logger({transports : [ consoleLoggerTransport ]}));
 app.use(expressWinston.errorLogger({transports : [ consoleLoggerTransport ]}));
 
@@ -47,7 +49,20 @@ app.get('/flickr-oauth-request', function(req, res, next) {
 });
 
 app.get('/flickr-oauth-callback', function(req, res) {
-  res.send("Welcome!");
+  pg.query(
+    "INSERT INTO flickr_oauth_tokens (oauth_token, oauth_verifier) VALUES ($1, $2)",
+    [
+      req.query.oauth_token,
+      req.query.oauth_verifier
+    ],
+    function(error, result) {
+      if (error) {
+        res.send("Creating record failed :(");
+      } else {
+        res.send("Creating record success :)");
+      }
+    }
+  )
 });
 
 // Just a stupid route for dumping database information for easy debugging
