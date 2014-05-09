@@ -1,5 +1,6 @@
 var path = require("path");
 var express = require("express");
+var helpers = require('express-helpers');
 var winston = require("winston");
 var expressWinston = require("express-winston");
 var crypto = require('crypto');
@@ -22,11 +23,13 @@ NodePhotoSyncUtils.setLogger([ consoleLoggerTransport ]);
 
 var pg = new PGClient();
 
+helpers(app);
 app.use(expressWinston.logger({transports : [ consoleLoggerTransport ]}));
 app.use(expressWinston.errorLogger({transports : [ consoleLoggerTransport ]}));
 
+
 app.get('/', function(req, res) {
-  res.send('Hello World!');
+  res.render('index.html.ejs');
 });
 
 app.get('/flickr-oauth-request', function(req, res, next) {
@@ -54,7 +57,7 @@ app.get('/flickr-oauth-callback', function(req, res) {
   shasum.update((new Date()).toJSON(), 'ascii');
   shasum.update(req.query.oauth_token, 'ascii');
   shasum.update(req.query.oauth_verifier, 'ascii');
-  var hash_identifier = shasum.digest('base64');
+  var hash_identifier = shasum.digest('hex');
 
   pg.query(
     "INSERT INTO flickr_oauth_tokens (oauth_token, oauth_verifier, hash_identifier) VALUES ($1, $2, $3)",
@@ -65,10 +68,10 @@ app.get('/flickr-oauth-callback', function(req, res) {
     ],
     function(error, result) {
       if (error) {
-        res.send("Creating record failed :(");
+        res.render('flickr_auth_error.html.ejs', {"error" : error});
       } else {
         res.cookie("flickr_identifier", hash_identifier, {"maxAge" : 24*60*60*1000, "httpOnly" : false});
-        res.send("Creating record success :)");
+        res.render('flickr_auth_success.html.ejs', {"flickr_identifier" : hash_identifier});
       }
     }
   );

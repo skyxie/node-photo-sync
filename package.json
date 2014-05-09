@@ -19,11 +19,13 @@
     , "underscore": "1.5.1"
     , "oauth" : "*"
     , "winston": "*"
-    , "express": "3.3.4"
+    , "express": "*"
+    , "express-helpers": "*"
     , "express-winston": "*"
     , "mime": "1.2.9"
     , "async": "*"
     , "pg" : "*"
+    , "ejs" : "*"
   },
 
   "devDependencies": {
