@@ -2,6 +2,7 @@ var path = require("path");
 var express = require("express");
 var winston = require("winston");
 var expressWinston = require("express-winston");
+var crypto = require('crypto');
 
 var Flickr = require(path.resolve(__dirname, "..", "lib", "flickr")).Flickr;
 var NodePhotoSyncUtils = require(path.resolve(__dirname, "..", "lib", "utils")).NodePhotoSyncUtils;
@@ -49,20 +50,28 @@ app.get('/flickr-oauth-request', function(req, res, next) {
 });
 
 app.get('/flickr-oauth-callback', function(req, res) {
+  var shasum = crypto.createHash('sha1');
+  shasum.update((new Date()).toJSON(), 'ascii');
+  shasum.update(req.query.oauth_token, 'ascii');
+  shasum.update(req.query.oauth_verifier, 'ascii');
+  var hash_identifier = shasum.digest('base64');
+
   pg.query(
-    "INSERT INTO flickr_oauth_tokens (oauth_token, oauth_verifier) VALUES ($1, $2)",
+    "INSERT INTO flickr_oauth_tokens (oauth_token, oauth_verifier, hash_identifier) VALUES ($1, $2, $3)",
     [
       req.query.oauth_token,
-      req.query.oauth_verifier
+      req.query.oauth_verifier,
+      hash_identifier
     ],
     function(error, result) {
       if (error) {
         res.send("Creating record failed :(");
       } else {
+        res.cookie("flickr_identifier", hash_identifier, {"maxAge" : 24*60*60*1000, "httpOnly" : false});
         res.send("Creating record success :)");
       }
     }
-  )
+  );
 });
 
 var port = process.env.PORT || 5000;
