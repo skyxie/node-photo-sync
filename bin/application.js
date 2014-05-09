@@ -65,17 +65,6 @@ app.get('/flickr-oauth-callback', function(req, res) {
   )
 });
 
-// Just a stupid route for dumping database information for easy debugging
-app.get('/db/table/:id', function(req, res, next) {
-  (new PGClient()).query("SELECT * FROM "+req.params.id, function(error, result) {
-    if (error) {
-      next(error);
-    } else {
-      res.json(result);
-    }
-  });
-});
-
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
   NodePhotoSyncUtils.logger.info("Listening on " + port);
