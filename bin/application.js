@@ -81,8 +81,18 @@ app.get('/flickr-oauth-callback', function(req, res) {
             if (error) {
               res.render('flickr_auth_error.html.ejs', {"error" : error});
             } else {
+              var uploadUrl = Flickr.oauth().signUrl(
+                Flickr.UPLOAD_URL,
+                oauth_access_token,
+                oauth_access_token_secret,
+                "POST"
+              );
+
               res.cookie("flickr_identifier", hash_identifier, {"maxAge" : 24*60*60*1000, "httpOnly" : false});
-              res.render('flickr_auth_success.html.ejs', {"flickr_identifier" : hash_identifier});
+              res.render('flickr_auth_success.html.ejs', {
+                          "flickr_identifier" : hash_identifier,
+                          "upload_url" : uploadUrl,
+                        });
             }
           }
         );  
