@@ -3,6 +3,7 @@ var express = require("express");
 var helpers = require('express-helpers');
 var winston = require("winston");
 var expressWinston = require("express-winston");
+var cookieParser = require("cookie-parser");
 var crypto = require('crypto');
 
 var Flickr = require(path.resolve(__dirname, "..", "lib", "flickr")).Flickr;
@@ -26,7 +27,7 @@ var pg = new PGClient();
 helpers(app);
 app.use(expressWinston.logger({transports : [ consoleLoggerTransport ]}));
 app.use(expressWinston.errorLogger({transports : [ consoleLoggerTransport ]}));
-
+app.use(cookieParser());
 
 app.get('/', function(req, res) {
   res.render('index.html.ejs');
@@ -46,6 +47,7 @@ app.get('/flickr-oauth-request', function(req, res, next) {
       if (error) {
         next(error);
       } else {
+        res.cookie("flickr_oauth_token_secret", oauthTokenSecret, {"maxAge" : 24*60*60*1000, "httpOnly" : false});
         res.redirect(Flickr.accessTokenLoginUrl(oauthToken));
       }
     }
@@ -55,6 +57,7 @@ app.get('/flickr-oauth-request', function(req, res, next) {
 app.get('/flickr-oauth-callback', function(req, res) {
   Flickr.getAccessToken(
     req.query.oauth_token,
+    req.cookies.flickr_oauth_token_secret,
     req.query.oauth_verifier,
     function(error, oauth_access_token, oauth_access_token_secret, results) {
       if (error) {

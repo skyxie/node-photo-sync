@@ -18,6 +18,7 @@
     , "fs.extra": "*"
     , "underscore": "1.5.1"
     , "oauth" : "*"
+    , "cookie-parser" : "*"
     , "winston": "*"
     , "express": "*"
     , "express-helpers": "*"
