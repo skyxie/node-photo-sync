@@ -73,7 +73,7 @@ app.get('/flickr-oauth-callback', function(req, res) {
         "INSERT INTO flickr_oauth_tokens (oauth_access_token, oauth_access_token_secret, hash_identifier) VALUES ($1, $2, $3)",
         [
           oauth_access_token,
-          oauth_access_token_secret
+          oauth_access_token_secret,
           hash_identifier
         ],
         function(error, result) {
