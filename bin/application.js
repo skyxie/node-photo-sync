@@ -53,26 +53,38 @@ app.get('/flickr-oauth-request', function(req, res, next) {
 });
 
 app.get('/flickr-oauth-callback', function(req, res) {
-  var shasum = crypto.createHash('sha1');
-  shasum.update((new Date()).toJSON(), 'ascii');
-  shasum.update(req.query.oauth_token, 'ascii');
-  shasum.update(req.query.oauth_verifier, 'ascii');
-  var hash_identifier = shasum.digest('hex');
+  Flickr.getAccessToken(
+    req.query.oauth_token,
+    req.query.oauth_verifier,
+    function(error, oauth_access_token, oauth_access_token_secret, results) {
+      var shasum = crypto.createHash('sha1');
+      shasum.update((new Date()).toJSON(), 'ascii');
+      shasum.update(oauth_access_token, 'ascii');
+      shasum.update(oauth_access_token_secret, 'ascii');
+      var hash_identifier = shasum.digest('hex');
 
-  pg.query(
-    "INSERT INTO flickr_oauth_tokens (oauth_token, oauth_verifier, hash_identifier) VALUES ($1, $2, $3)",
-    [
-      req.query.oauth_token,
-      req.query.oauth_verifier,
-      hash_identifier
-    ],
-    function(error, result) {
-      if (error) {
-        res.render('flickr_auth_error.html.ejs', {"error" : error});
-      } else {
-        res.cookie("flickr_identifier", hash_identifier, {"maxAge" : 24*60*60*1000, "httpOnly" : false});
-        res.render('flickr_auth_success.html.ejs', {"flickr_identifier" : hash_identifier});
-      }
+      NodePhotoSyncUtils.logger.info({
+        "oauth_access_token" : oauth_access_token,
+        "oauth_access_token_secret" : oauth_access_token_secret,
+        "hash" : hash_identifier
+      });
+
+      pg.query(
+        "INSERT INTO flickr_oauth_tokens (oauth_access_token, oauth_access_token_secret, hash_identifier) VALUES ($1, $2, $3)",
+        [
+          oauth_access_token,
+          oauth_access_token_secret
+          hash_identifier
+        ],
+        function(error, result) {
+          if (error) {
+            res.render('flickr_auth_error.html.ejs', {"error" : error});
+          } else {
+            res.cookie("flickr_identifier", hash_identifier, {"maxAge" : 24*60*60*1000, "httpOnly" : false});
+            res.render('flickr_auth_success.html.ejs', {"flickr_identifier" : hash_identifier});
+          }
+        }
+      );
     }
   );
 });
