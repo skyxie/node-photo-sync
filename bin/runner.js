@@ -1,6 +1,7 @@
 
 var path = require("path");
 var winston = require("winston");
+var sleep = require('sleep');
 
 var lib = path.resolve(__dirname, "..", "lib");
 var streams = require(path.join(lib, "streams"));
@@ -29,14 +30,11 @@ inputJob.runner()(function(error, inputStream) {
     NodePhotoSyncUtils.logger.error(error);
   } else {
     NodePhotoSyncUtils.logger.debug("Opening output stream");
-    outputJob.runner()(inputStream, function(error, outputStream) {
+    outputJob.runner()(inputStream, function(error) {
       if (error) {
         NodePhotoSyncUtils.logger.error(error);
-      } else {
-        inputStream.on('end', function() {
-          NodePhotoSyncUtils.logger.info("pipe complete");
-        });
       }
     })
   }
 });
+

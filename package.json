@@ -23,6 +23,7 @@
     "express": "*",
     "express-helpers": "*",
     "express-winston": "*",
+    "body-parser": "*",
     "mime": "1.2.9",
     "async": "*",
     "pg" : "*",
