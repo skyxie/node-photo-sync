@@ -1,5 +1,6 @@
 
 var path = require("path");
+var fs = require("fs.extra");
 var winston = require("winston");
 var sleep = require('sleep');
 
@@ -19,22 +20,24 @@ var consoleLoggerTransport = new winston.transports.Console({
 NodePhotoSyncUtils.setLogger([ consoleLoggerTransport ]);
 
 NodePhotoSyncUtils.logger.info("Running job: "+process.argv[2]);
-var job = JSON.parse(process.argv[2]);
 
-var inputJob = new InputStream(job.i);
-var outputJob = new OutputStream(job.o);
+fs.readFile(process.argv[2], function(error, data) {
+  var job = JSON.parse(data);
 
-NodePhotoSyncUtils.logger.debug("Opening input stream");
-inputJob.runner()(function(error, inputStream) {
-  if (error) {
-    NodePhotoSyncUtils.logger.error(error);
-  } else {
-    NodePhotoSyncUtils.logger.debug("Opening output stream");
-    outputJob.runner()(inputStream, function(error) {
-      if (error) {
-        NodePhotoSyncUtils.logger.error(error);
-      }
-    })
-  }
+  var inputJob = new InputStream(job.i);
+  var outputJob = new OutputStream(job.o);
+
+  NodePhotoSyncUtils.logger.debug("Opening input stream");
+  inputJob.runner()(function(error, inputStream) {
+    if (error) {
+      NodePhotoSyncUtils.logger.error(error);
+    } else {
+      NodePhotoSyncUtils.logger.debug("Opening output stream");
+      outputJob.runner()(inputStream, function(error) {
+        if (error) {
+          NodePhotoSyncUtils.logger.error(error);
+        }
+      })
+    }
+  });
 });
-
